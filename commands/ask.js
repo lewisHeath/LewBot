@@ -21,17 +21,14 @@ module.exports = {
         .setDescription('Ask a question and get an answer!')
         .addStringOption(option =>
             option
-                .setName('input')
+                .setName('question')
                 .setDescription('The question to ask')
-                .setRequired(true)
-                .setAutocomplete(true)),
-
-    async autocomplete(interaction) {
-    },
+                .setRequired(true)),
 
     async execute(interaction) {
         // get the users input
-        let option = interaction.options.getString('input');
+        let option = interaction.options.getString('question');
+        console.log(option);
         await interaction.deferReply();
         if(locked){
             // has it been over 24 hours?
@@ -43,27 +40,32 @@ module.exports = {
                 return;
             }
         }
-        // read the text from the file ../prompt.txt
-        const promptPath = path.join(__dirname, '../prompt.txt');
-        const prompt = fs.readFileSync(promptPath, 'utf8');
-        option = prompt + option + "\n\n";
-        console.log(option);
+        try{
+            // read the text from the file ../prompt.txt
+            const promptPath = path.join(__dirname, '../prompt.txt');
+            const prompt = fs.readFileSync(promptPath, 'utf8');
+            option = prompt + option + "\n\n";
+            console.log(option);
 
-        // make the API request
-        const response = await openai.createCompletion({
-            model: "text-davinci-003",
-            prompt: option,
-            temperature: 0,
-            max_tokens: 1000,
-        });
+            // make the API request
+            const response = await openai.createCompletion({
+                model: "text-davinci-003",
+                prompt: option,
+                temperature: 0,
+                max_tokens: 1000,
+            });
 
-        text = response.data.choices[0].text;
-        // trim all white space
-        text = text.replace(/\s+/g, ' ').trim();
-        reply = `${interaction.options.getString('input')} - ${interaction.user}\n\n`;
-        reply += text;
-        await interaction.editReply(reply);
-        counter++;
+            text = response.data.choices[0].text;
+            // trim all white space
+            text = text.replace(/\s+/g, ' ').trim();
+            reply = `${interaction.options.getString('question')} - ${interaction.user}\n\n`;
+            reply += text;
+            await interaction.editReply(reply);
+            counter++;
+        } catch (error) {
+            console.error(error);
+            await interaction.editReply("There was an error while executing this command!");
+        }
 
         if (counter >= 20) {
             console.log("You have reached the daily limit of 20 requests.");

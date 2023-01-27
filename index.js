@@ -1,5 +1,5 @@
 // Require the necessary discord.js classes
-const { Client, Events, GatewayIntentBits, Collection } = require('discord.js');
+const { Client, Events, GatewayIntentBits, Collection, ActivityType } = require('discord.js');
 const { token } = require('./config.json');
 
 const fs = require('fs');
@@ -38,18 +38,6 @@ client.on(Events.InteractionCreate, async interaction => {
             console.error(error);
             await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
         }
-    } else if (interaction.isAutocomplete()) {
-        // get the command
-        const command = client.commands.get(interaction.commandName);
-        // if not found just return
-        if (!command) return;
-        // try and execute
-        try {
-            await command.autocomplete(interaction);
-        } catch (error) {
-            console.error(error);
-            await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-        }
     }
 });
 
@@ -58,6 +46,14 @@ client.on(Events.InteractionCreate, async interaction => {
 client.once(Events.ClientReady, c => {
     console.log(`Ready! Logged in as ${c.user.tag}`);
 });
+
+client.on("ready", () => {
+    client.user.setPresence({
+        activities: [{ name: `you`, type: ActivityType.Watching }],
+        status: 'dnd',
+    });
+});
+
 
 // Log in to Discord with your client's token
 client.login(token);
