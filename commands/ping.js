@@ -19,6 +19,8 @@ module.exports = {
         // reply with the input
         await interaction.deferReply();
         await wait(2000);
-        await interaction.editReply(`Pong! You said: ${option}`);
+        reply = `Pong! You said: ${option} ${interaction.user}`;
+
+        await interaction.editReply(reply);
     },
 };
