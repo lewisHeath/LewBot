@@ -9,7 +9,9 @@ const path = require('path');
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 client.commands = new Collection();
+client.buttons = new Collection();
 
+// commands
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
@@ -22,6 +24,17 @@ for (const file of commandFiles) {
     } else {
         console.log(`Command ${file} is not valid.`);
     }
+}
+
+// buttons
+const buttonsPath = path.join(__dirname, 'buttons');
+const buttonFiles = fs.readdirSync(buttonsPath).filter(file => file.endsWith('.js'));
+
+for (const file of buttonFiles) {
+    const filePath = path.join(buttonsPath, file);
+    const button = require(filePath);
+    // update the map
+    client.buttons.set(button.data.name, button);
 }
 
 // events
@@ -38,7 +51,7 @@ client.on(Events.InteractionCreate, async interaction => {
             console.error(error);
             await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
         }
-    } else if (interaction.isAutocomplete) {
+    } else if (interaction.isAutocomplete()) {
         // get the command
         const command = client.commands.get(interaction.commandName);
         // if not found just return
@@ -50,6 +63,11 @@ client.on(Events.InteractionCreate, async interaction => {
             console.error(error);
             await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
         }
+    } else if (interaction.isButton()) {
+        // find the command this button belongs to
+        console.log(interaction.customId);
+        const button = client.buttons.get(interaction.customId);
+        await button.execute(interaction);
     }
 });
 
