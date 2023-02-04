@@ -7,7 +7,7 @@ module.exports = {
         .setName('meme')
         .setDescription('Gets a meme!'),
 
-    async execute(interaction) {
+    async execute(interaction, client) {
         await interaction.deferReply();
 
         try {

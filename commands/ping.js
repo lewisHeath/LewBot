@@ -13,7 +13,7 @@ module.exports = {
                 .setAutocomplete(true)),
     async autocomplete(interaction) {
     },
-    async execute(interaction) {
+    async execute(interaction, client) {
         // get the users input
         const option = interaction.options.getString('input');
         // reply with the input

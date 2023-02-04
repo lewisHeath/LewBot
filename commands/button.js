@@ -5,7 +5,7 @@ module.exports = {
         .setName('button')
         .setDescription('makes a button!'),
 
-    async execute(interaction) {
+    async execute(interaction, client) {
         const row = new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()

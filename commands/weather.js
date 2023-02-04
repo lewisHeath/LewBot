@@ -16,7 +16,7 @@ choices.shift();
 // the current format is '"city"' so remove the quotes
 choices = choices.map(choice => choice.replace(/"/g, ''));
 
-console.log(choices);
+// console.log(choices);
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -43,7 +43,7 @@ module.exports = {
         );
     },
 
-    async execute(interaction) {
+    async execute(interaction, client) {
         // get the users input
         let option = interaction.options.getString('place');
         const url = api + option;

@@ -25,7 +25,7 @@ module.exports = {
                 .setDescription('The question to ask')
                 .setRequired(true)),
 
-    async execute(interaction) {
+    async execute(interaction, client) {
         // get the users input
         let option = interaction.options.getString('question');
         console.log(option);

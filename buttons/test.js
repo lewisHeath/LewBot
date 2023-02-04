@@ -3,6 +3,9 @@ module.exports = {
         name: "test"
     },
     async execute(interaction) {
-        await interaction.reply({ content: "this is a test from the other file" })
+        await interaction.reply({ 
+            content: "This is a test",
+            ephemeral: true
+         })
     }
 }

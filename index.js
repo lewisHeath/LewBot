@@ -6,7 +6,10 @@ const fs = require('fs');
 const path = require('path');
 
 // Create a new client instance
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const { Guilds, GuildMessages, GuildMessageReactions } = GatewayIntentBits;
+const client = new Client({ intents: [
+    Guilds, GuildMessages, GuildMessageReactions
+]});
 
 client.commands = new Collection();
 client.buttons = new Collection();
@@ -46,7 +49,7 @@ client.on(Events.InteractionCreate, async interaction => {
         if (!command) return;
         // try and execute
         try {
-            await command.execute(interaction);
+            await command.execute(interaction, client);
         } catch (error) {
             console.error(error);
             await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
@@ -65,9 +68,17 @@ client.on(Events.InteractionCreate, async interaction => {
         }
     } else if (interaction.isButton()) {
         // find the command this button belongs to
-        console.log(interaction.customId);
         const button = client.buttons.get(interaction.customId);
-        await button.execute(interaction);
+        // if not found 
+        if(!button) {
+            console.error("no button found")
+        }
+        try {
+            await button.execute(interaction);
+        } catch(error) {
+            console.error(error);
+            await interaction.reply({ content: 'There was an error while executing this button!', ephemeral: true });
+        }
     }
 });
 

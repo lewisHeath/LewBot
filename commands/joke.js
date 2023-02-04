@@ -12,7 +12,7 @@ module.exports = {
                 .setDescription('The word the joke must contain')
                 .setRequired(false)),
 
-    async execute(interaction) {
+    async execute(interaction, client) {
         await interaction.deferReply();
 
         let option = interaction.options.getString('contains');
