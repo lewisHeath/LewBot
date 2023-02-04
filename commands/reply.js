@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 
-const colours = ['red', 'orange', 'yellow', 'green', 'blue', 'purple']
+const colours = ['red', 'orange', 'yellow', 'green', 'cyan', 'blue', 'purple']
 
 module.exports = {
     data: new SlashCommandBuilder()

@@ -4,15 +4,22 @@ const { token } = require('./config.json');
 
 const fs = require('fs');
 const path = require('path');
+const { Player } = require("discord-player")
 
 // Create a new client instance
-const { Guilds, GuildMessages, GuildMessageReactions } = GatewayIntentBits;
+const { Guilds, GuildMessages, GuildMessageReactions, GuildVoiceStates } = GatewayIntentBits;
 const client = new Client({ intents: [
-    Guilds, GuildMessages, GuildMessageReactions
+    Guilds, GuildMessages, GuildMessageReactions, GuildVoiceStates
 ]});
 
 client.commands = new Collection();
 client.buttons = new Collection();
+client.player = new Player(client, {
+    ytdlOptions: {
+        quality: "highestaudio",
+        highWaterMark: 1 << 25
+    }
+});
 
 // commands
 const commandsPath = path.join(__dirname, 'commands');
