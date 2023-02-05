@@ -26,7 +26,14 @@ module.exports = {
         if (!searchResult || !searchResult.tracks.length) return interaction.reply({ content: 'No results were found!', ephemeral: true });
         
         // make the queue
-        const queue = await client.player.createQueue(interaction.guild);
+        let queue = await client.player.getQueue(interaction.guildId);
+        // if there is no queue, then make one
+        if (!queue) {
+            console.log('making queue')
+            queue = await client.player.createQueue(interaction.guild, {
+                metadata: interaction.channel
+            });
+        }
         
         // join the voice channel only if not already in it
         try {
@@ -35,23 +42,16 @@ module.exports = {
             client.player.deleteQueue(interaction.guildId);
             return interaction.reply({ content: 'Could not join your voice channel!', ephemeral: true });
         }
-        // if the first song is a playlist
-        if (searchResult.playlist) {
-            // add the whole playlist to the queue
-            queue.addTracks(searchResult.tracks);
-            // if there is no queue yet, then play the song
-            if (!queue.playing) {
-                queue.play();
-            }
-            // if the first song is not a playlist
-        } else {
-            // add the song to the queue
-            queue.addTrack(searchResult.tracks[0]);
-            console.log(queue.tracks)
-            // if there is no queue yet, then play the song
-            if (!queue.playing) {
-                queue.play();
-            }
+        
+        // add the song to the queue (TWICE - because of unknown bug where it skips 2)
+        await queue.addTrack(searchResult.tracks[0]);
+        await queue.addTrack(searchResult.tracks[0]);
+        const playing = queue.playing;
+        console.log(queue.tracks)
+        console.log(playing)
+        if(playing == false) {
+            console.log('playing')
+            await queue.play();
         }
         
         // get random colour
