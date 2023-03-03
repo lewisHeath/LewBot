@@ -40,27 +40,46 @@ module.exports = {
                 return;
             }
         }
-        try{
-            // read the text from the file ../prompt.txt
-            const promptPath = path.join(__dirname, '../prompt.txt');
-            const prompt = fs.readFileSync(promptPath, 'utf8');
-            option = prompt + option + "\n\n";
-            console.log(option);
 
-            // make the API request
-            const response = await openai.createCompletion({
-                model: "text-davinci-003",
-                prompt: option,
-                temperature: 0,
-                max_tokens: 1000,
+        // get the conversation history from the channel
+        let history = await interaction.channel.messages.fetch({ limit: 100 });
+        // get the name of the user who sent the message and the content of the message
+        // history = history.map(message => `${message.author.username}: ${message.content}`);
+        messages = [];
+        messages.push({ "role": "user", "content": option });
+        // add the messages to the array
+        history.forEach(message => {
+            if(message.author.username == "LewBot 4.0"){
+                messages.push({ "role": "assistant", "content": message.content });
+            } else {
+                messages.push({ "role": "user", "content": message.content });
+            }
+        });
+
+        messages.push({ "role": "system", "content": "You are a helpful assistant." });
+        // reverse the array so that the most recent message is first
+        messages.reverse();
+
+        // remove any messages that are empty
+        messages = messages.filter(message => message.content != "");
+
+        console.log(messages);
+
+        try{
+            // make a post request to localhost:5000 with the body being the messages
+            // wait longer than 3 seconds for a response
+            const response = await fetch('http://localhost:5000/api', {
+                method: 'POST',
+                body: JSON.stringify(messages),
+                headers: { 'Content-Type': 'application/json' }
             });
 
-            text = response.data.choices[0].text;
-            // trim all white space
-            text = text.replace(/\s+/g, ' ').trim();
-            reply = `${interaction.options.getString('question')} - ${interaction.user}\n\n`;
-            reply += text;
-            await interaction.editReply(reply);
+            // get the response
+            let json = await response.json();
+
+            console.log(json);
+
+            await interaction.editReply(json);
             counter++;
         } catch (error) {
             console.error(error);
