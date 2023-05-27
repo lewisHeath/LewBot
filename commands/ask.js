@@ -30,9 +30,9 @@ module.exports = {
         let option = interaction.options.getString('question');
         console.log(option);
         await interaction.deferReply();
-        if(locked){
+        if (locked) {
             // has it been over 24 hours?
-            if(Date.now() - timeLockedAt >= 86400000){
+            if (Date.now() - timeLockedAt >= 86400000) {
                 locked = false;
                 counter = 0;
             } else {
@@ -49,14 +49,17 @@ module.exports = {
         messages.push({ "role": "user", "content": option });
         // add the messages to the array
         history.forEach(message => {
-            if(message.author.username == "LewBot 4.0"){
+            if (message.author.username == "LewBot 4.0") {
                 messages.push({ "role": "assistant", "content": message.content });
             } else {
                 messages.push({ "role": "user", "content": message.content });
             }
         });
 
-        messages.push({ "role": "system", "content": "You are a helpful assistant." });
+        // get the pesonality from the file ../personality.txt
+        let personality = fs.readFileSync(path.join(__dirname, '../personality.txt'), 'utf8');
+
+        messages.push({ "role": "system", "content": personality });
         // reverse the array so that the most recent message is first
         messages.reverse();
 
@@ -74,15 +77,17 @@ module.exports = {
                 headers: { 'Content-Type': 'application/json' }
             });
 
-            // get the response
-            let json = await response.json();
+            const reply = await response.json();
+	    console.log("--------");
+	    console.log(reply);
+	    console.log("--------");
+            let response_to_user = `${interaction.options.getString('question')} - ${interaction.user}\n\n`;
+            response_to_user += reply;
 
-            console.log(json);
-
-            await interaction.editReply(json);
+            await interaction.editReply(response_to_user);
             counter++;
         } catch (error) {
-            console.error(error);
+            console.error("OpenAI API error:", error);
             await interaction.editReply("There was an error while executing this command!");
         }
 
