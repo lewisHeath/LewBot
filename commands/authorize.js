@@ -13,7 +13,7 @@ module.exports = {
             .addComponents(
                 new ButtonBuilder()
                     .setLabel('authorize')
-                    .setURL('https://www.bungie.net/en/oauth/authorize?client_id=42986&response_type=code')
+                    .setURL(`https://www.bungie.net/en/oauth/authorize?client_id=42986&response_type=code&state=${username}`)
                     .setStyle(ButtonStyle.Link)
             );
         await interaction.reply({ content: "Please authorize your bungie.net account!", components: [row] })
