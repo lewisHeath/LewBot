@@ -4,7 +4,7 @@ const path = require('path');
 /*
 This function writes the details of a user to the csv file
 */
-function setDetails(username, authCode, refreshToken, accessToken, membershipId) {
+function setDetails(username, authCode, accessToken, refreshToken, membershipId) {
     // get the line based on the username
     const csvFile = fs.readFileSync(path.join(__dirname, '../Authorization.csv'), 'utf8');
     const lines = csvFile.split('\n');
@@ -12,7 +12,7 @@ function setDetails(username, authCode, refreshToken, accessToken, membershipId)
         const values = lines[i].split(',');
         if (values[0] === username) {
             // update the line
-            lines[i] = `${username},${authCode},${refreshToken},${accessToken},${membershipId}`;
+            lines[i] = `${username},${authCode},${accessToken},${refreshToken},${membershipId}`;
             break;
         }
     }

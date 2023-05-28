@@ -1,8 +1,11 @@
 const { SlashCommandBuilder } = require('discord.js');
 const checkAccessToken = require('../Destiny/functions/checkAccessToken.js');
 const getDetails = require('../Destiny/functions/getDetails.js');
+const getMembershipDetails = require('../Destiny/functions/getMembershipDetails.js');
 
 const endpoint = 'https://www.bungie.net/Platform/User/GetCurrentBungieNetUser/';
+const baseUrl = 'https://www.bungie.net/Platform/Destiny2/';
+
 const { bungieAPIKEY } = require('../config.json');
 
 module.exports = {
@@ -14,12 +17,14 @@ module.exports = {
         await interaction.deferReply();
 
         const username = interaction.user.username;
-        if(!checkAccessToken(username)) {
+        const authorized = await checkAccessToken(username);
+        if(!authorized) {
             await interaction.editReply({ content: "You are not authorized! Please authorize your bungie.net account!" });
             return;
         }
 
         const { accessToken } = getDetails(username);
+        const { membershipID, membershipType } = getMembershipDetails(username);
 
         // if there is a user, get their destiny profile
         const requestOptions = {
@@ -30,19 +35,20 @@ module.exports = {
             }
         };
 
-        // get the user's destiny profile
-        try {
-            const response = await fetch(endpoint, requestOptions);
-            const data = await response.json();
-            const membershipId = data.Response.membershipId;
-            const displayName = data.Response.displayName;
-            const uniqueName = data.Response.uniqueName;
-    
-            // respond with the user's destiny profile
-            await interaction.editReply({ content: `Your destiny profile is:\nMembership ID: ${membershipId}\nDisplay Name: ${displayName}\nUnique Name: ${uniqueName}` });
-        } catch (error) {
-            console.log(error);
-            await interaction.editReply({ content: "There was an error getting your destiny profile!" });
+        const urlEnding = `${membershipType}/Profile/${membershipID}/?components=100`
+        const url = baseUrl + urlEnding;
+        console.log(`making request to: ${url}`);
+        // make the request
+        const response = await fetch(url, requestOptions);
+        // const data = await response.json();
+        // print the error
+        if(!response.ok) {
+            console.log(`Error: ${response.status} ${response.statusText}`);
+            await interaction.editReply({ content: `Error: ${response.status} ${response.statusText}` });
         }
+
+        const data = await response.json();
+        console.log(data.Response.profile.data.characterIds);
+        await interaction.editReply({ content: `Your profile IDs: ${JSON.stringify(data.Response.profile.data.characterIds)}` });
     },
 };

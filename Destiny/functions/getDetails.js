@@ -7,8 +7,8 @@ This function returns the data from the csv file based on the username
 function getDetails(username) {
     // based on the username, return the csv row from ../Authorization.csv
     let authCode = '';
-    let refreshToken = '';
     let accessToken = '';
+    let refreshTokenValue = '';
     let membershipId = '';
     
     const csvFile = fs.readFileSync(path.join(__dirname, '../Authorization.csv'), 'utf8');
@@ -18,18 +18,20 @@ function getDetails(username) {
         const values = line.split(',');
         if (values[0] === username) {
             authCode = values[1];
-            refreshToken = values[2];
-            accessToken = values[3];
+            accessToken = values[2];
+            refreshTokenValue = values[3];
             membershipId = values[4];
             break;
         }
     }
 
-    if(authCode === '' || refreshToken === '' || accessToken === '' || membershipId === '') {
+    if(authCode === '' || accessToken === '' || refreshTokenValue === '' || membershipId === '') {
         throw new Error('There was an error getting the details from the csv file!');
     }
 
-    return { authCode, refreshToken, accessToken, membershipId };
+    console.log(`refresh token: ${refreshTokenValue}`)
+
+    return { authCode, accessToken, refreshTokenValue, membershipId };
 }
 
 module.exports = getDetails;
