@@ -29,7 +29,7 @@ function getDetails(username) {
         throw new Error('There was an error getting the details from the csv file!');
     }
 
-    console.log(`refresh token: ${refreshTokenValue}`)
+    // console.log(`refresh token: ${refreshTokenValue}`)
 
     return { authCode, accessToken, refreshTokenValue, membershipId };
 }

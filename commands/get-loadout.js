@@ -15,21 +15,42 @@ const rgbToHex = require('../rgbToHex.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('destiny-profile')
-        .setDescription('Gets your destiny profile!'),
+        .setName('get-loadout')
+        .setDescription('Gets someones destiny loadout!')
+        .addStringOption(option =>
+            option
+                .setName('username')
+                .setDescription('The bungie username e.g. player#1234')
+                .setRequired(true)),
 
     async execute(interaction, client) {
         await interaction.deferReply();
-
-        const username = interaction.user.username;
-        const authorized = await checkAccessToken(username);
-        if(!authorized) {
-            await interaction.editReply({ content: "You are not authorized! Please authorize your bungie.net account!" });
-            return;
+        let username = interaction.options.getString('username');
+        // split the username into parts before and after the #
+        const usernameParts = username.split('#');
+        const displayName = usernameParts[0];
+        const displayNameCode = usernameParts[1];
+        const getPlayerEndpoint = `https://www.bungie.net/Platform/Destiny2/SearchDestinyPlayerByBungieName/-1/`
+        const getPlayerBody = {
+            "displayName": displayName,
+            "displayNameCode": displayNameCode
         }
 
-        const { accessToken } = getDetails(username);
-        const { membershipID, membershipType } = getMembershipDetails(username);
+        const getPlayerOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-KEY': bungieAPIKEY
+            },
+            body: JSON.stringify(getPlayerBody)
+        }
+
+        console.log(`making request to ${getPlayerEndpoint} with body ${JSON.stringify(getPlayerBody)}`)
+
+        const getPlayerResponse = await fetch(getPlayerEndpoint, getPlayerOptions);
+        const getPlayerData = await getPlayerResponse.json();
+        const membershipID = getPlayerData.Response[0].membershipId;
+        const membershipType = getPlayerData.Response[0].membershipType;
 
         const destiny = new Destiny2API({
             key: bungieAPIKEY,
@@ -80,16 +101,16 @@ module.exports = {
             .setThumbnail(`${bungieurl}${items[2].displayProperties.icon}`)
             .setColor(colour) //TODO: change to legendary or exotic
             .setDescription(`${items[2].itemTypeDisplayName}`)
-        
+
         const exoticArmourEmbed = new EmbedBuilder()
             .setTitle(`${exoticArmour[0].displayProperties.name}`)
             .setThumbnail(`${bungieurl}${exoticArmour[0].displayProperties.icon}`)
             .setColor(colour) //TODO: change to legendary or exotic
             .setDescription(`${exoticArmour[0].itemTypeDisplayName}`)
-        
+
         // If there is no exotic armour, only send the weapons
         let embeds = [];
-        if(exoticArmour.length === 0) {
+        if (exoticArmour.length === 0) {
             embeds = [kineticWeapon, energyWeapon, powerWeapon];
         } else {
             embeds = [kineticWeapon, energyWeapon, powerWeapon, exoticArmourEmbed];
