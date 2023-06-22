@@ -40,7 +40,7 @@ module.exports = {
         });
 
         const profile = await destiny.getProfile(membershipType, membershipID, ['100']);
-        // console.log(profile.Response.profile);
+        // console.log(profile);
         const characterId = profile.Response.profile.data.characterIds[0];
         const character = await destiny.getCharacter(membershipType, membershipID, characterId, ['200', '205']);
         const equipment = character.Response.equipment.data.items;

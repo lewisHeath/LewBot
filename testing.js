@@ -1,12 +1,10 @@
-let currentDate = new Date();
+const manifest = require('./Destiny/manifest.js');
 
-let startDate = new Date("December 3, 2022 00:00:00");
-let endDate = new Date("March 10, 2023 00:00:00");
+// Access the item definitions
+const itemDefinitions = manifest.DestinyInventoryItemDefinition;
 
-let totalTime = endDate - startDate;
-let elapsedTime = currentDate - startDate;
+// Example: Accessing an item definition by its hash
+const itemHash = 2715240478; // Replace with the desired item hash
+const itemDefinition = itemDefinitions[itemHash];
 
-let percentElapsed = (elapsedTime / totalTime) * 100;
-// round to 2 decimal places
-percentElapsed = percentElapsed.toFixed(2);
-
+console.log(itemDefinition);

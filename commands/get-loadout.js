@@ -60,8 +60,7 @@ module.exports = {
             }
         });
 
-        const profile = await destiny.getProfile(membershipType, membershipID, ['100']);
-        // console.log(profile.Response.profile);
+        const profile = await destiny.getProfile(membershipType, membershipID, ['100', '200']);  
         const characterId = profile.Response.profile.data.characterIds[0];
         const character = await destiny.getCharacter(membershipType, membershipID, characterId, ['200', '205']);
         const equipment = character.Response.equipment.data.items;
@@ -79,34 +78,39 @@ module.exports = {
 
         // Find the exotic armour piece
         const exoticArmour = cutItems.filter(item => item.inventory.tierTypeName === 'Exotic' && item.itemType === 2);
-        // console.log(exoticArmour);
-
-        console.log(items[0])
 
         // For each weapon create an embed and for the exotic armour piece create an embed
         const kineticWeapon = new EmbedBuilder()
-            .setTitle(`${items[0].displayProperties.name}`)
+            .setTitle(`${items[0].displayProperties.name}        `)
             .setThumbnail(`${bungieurl}${items[0].displayProperties.icon}`)
-            .setColor(colour) //TODO: change to legendary or exotic
+            .setColor(items[0].inventory.tierTypeName === 'Exotic' ? '#d0ac34' : '#582c64') //TODO: change to legendary or exotic
             .setDescription(`${items[0].itemTypeDisplayName}`)
 
         const energyWeapon = new EmbedBuilder()
-            .setTitle(`${items[1].displayProperties.name}`)
+            .setTitle(`${items[1].displayProperties.name}           `)
             .setThumbnail(`${bungieurl}${items[1].displayProperties.icon}`)
-            .setColor(colour) //TODO: change to legendary or exotic
+            .setColor(items[1].inventory.tierTypeName === 'Exotic' ? '#d0ac34' : '#582c64') //TODO: change to legendary or exotic
             .setDescription(`${items[1].itemTypeDisplayName}`)
 
         const powerWeapon = new EmbedBuilder()
-            .setTitle(`${items[2].displayProperties.name}`)
+            .setTitle(`${items[2].displayProperties.name}             `)
             .setThumbnail(`${bungieurl}${items[2].displayProperties.icon}`)
-            .setColor(colour) //TODO: change to legendary or exotic
+            .setColor(items[2].inventory.tierTypeName === 'Exotic' ? '#d0ac34' : '#582c64') //TODO: change to legendary or exotic
             .setDescription(`${items[2].itemTypeDisplayName}`)
 
         const exoticArmourEmbed = new EmbedBuilder()
-            .setTitle(`${exoticArmour[0].displayProperties.name}`)
+            .setTitle(`${exoticArmour[0].displayProperties.name}                `)
             .setThumbnail(`${bungieurl}${exoticArmour[0].displayProperties.icon}`)
-            .setColor(colour) //TODO: change to legendary or exotic
+            .setColor('#d0ac34') //TODO: change to legendary or exotic
             .setDescription(`${exoticArmour[0].itemTypeDisplayName}`)
+
+        // character overview embed 
+        const characterEmbed = new EmbedBuilder()
+            // .setTitle(`${profile.Response.profile.data.userInfo.bungieGlobalDisplayName} #${profile.Response.profile.data.userInfo.bungieGlobalDisplayNameCode}          `)
+            // .setThumbnail(`${bungieurl}${character.Response.character.data.emblemPath}`)
+            .setAuthor({ name: `${profile.Response.profile.data.userInfo.bungieGlobalDisplayName} #${profile.Response.profile.data.userInfo.bungieGlobalDisplayNameCode}`, iconURL: `${bungieurl}${character.Response.character.data.emblemPath}` })
+            .setColor(colour)
+            // .setDescription(`Power Level: ${character.Response.character.data.light}`)
 
         // If there is no exotic armour, only send the weapons
         let embeds = [];
@@ -115,6 +119,8 @@ module.exports = {
         } else {
             embeds = [kineticWeapon, energyWeapon, powerWeapon, exoticArmourEmbed];
         }
+
+        embeds.unshift(characterEmbed);
 
         await interaction.editReply({ embeds: embeds });
 

@@ -6,6 +6,8 @@ const fs = require('fs');
 const path = require('path');
 const { Player } = require("discord-player")
 
+// const manifest = require('./Destiny/manifest.js');
+
 // Create a new client instance
 const { Guilds, GuildMessages, GuildMessageReactions, GuildVoiceStates } = GatewayIntentBits;
 const client = new Client({ intents: [
