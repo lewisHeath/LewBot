@@ -3,3 +3,5 @@ config.json
 Destiny/Authorization.csv
 Destiny/Tokens.csv
 Destiny/Memberships.csv
+Destiny/manifest.json
+statuses.txt

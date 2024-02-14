@@ -4,7 +4,8 @@ const { token } = require('./config.json');
 
 const fs = require('fs');
 const path = require('path');
-const { Player } = require("discord-player")
+const { Player } = require("discord-player");
+const { error } = require('console');
 
 // const manifest = require('./Destiny/manifest.js');
 
@@ -109,16 +110,59 @@ client.on(Events.InteractionCreate, async interaction => {
 // When the client is ready, run this code (only once)
 // We use 'c' for the event parameter to keep it separate from the already defined 'client'
 client.once(Events.ClientReady, c => {
+    // output lewbot to the screen
+
+    console.log(`===============================================`);
+    console.log(`
+    __    _______       ______  ____  ______
+   / /   / ____/ |     / / __ )/ __ \/_  __/
+  / /   / __/  | | /| / / __  / / / / / /
+ / /___/ /___  | |/ |/ / /_/ / /_/ / / /
+/_____/_____/  |__/|__/_____/\____/ /_/
+
+`);
+    console.log(`===============================================`);
     console.log(`Ready! Logged in as ${c.user.tag}`);
 });
 
 client.on("ready", () => {
+    const statuses = [
+        { name: "you ;)", type: ActivityType.Watching },
+    ];
+
     client.user.setPresence({
-        activities: [{ name: `you`, type: ActivityType.Watching }],
+        activities: [{ name: `a game`, type: ActivityType.Playing }],
         status: 'dnd',
     });
+
+    setStatusFromTextFile();
+    setInterval(() => {
+        // var randomStatus = statuses[Math.floor(Math.random()*statuses.length)];
+        // client.user.setActivity(randomStatus.name, {type: randomStatus.type})
+        setStatusFromTextFile();
+    }, 1000 * 10 * 60);
 });
 
+function setStatusFromTextFile() {
+    // const file = '/root/DiscordBot/LewBot/statuses.txt';
+    const file = 'statuses.txt';
+    fs.readFile(file, 'utf8', (err, data) => {
+        if (err){
+            console.log(error);
+            return;
+        }
+        //split into lines
+        const lines = data.split('\n');
+        // get a random line from the file
+        const randomLine = lines[Math.floor(Math.random() * lines.length)].trim();
+        console.log(`line chosen: ${randomLine}`);
+        client.user.setActivity({
+            type: ActivityType.Custom,
+            name: 'customstatus',
+            state: randomLine
+        });
+    });
+}
 
 // Log in to Discord with your client's token
 client.login(token);
