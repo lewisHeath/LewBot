@@ -1,6 +1,7 @@
 // Require the necessary discord.js classes
 const { Client, Events, GatewayIntentBits, Collection, ActivityType } = require('discord.js');
 const { token } = require('./config.json');
+const schedule = require('node-schedule');
 
 const fs = require('fs');
 const path = require('path');
@@ -125,7 +126,7 @@ client.once(Events.ClientReady, c => {
     console.log(`Ready! Logged in as ${c.user.tag}`);
 });
 
-client.on("ready", () => {
+client.on("ready", async () => {
     const statuses = [
         { name: "you ;)", type: ActivityType.Watching },
     ];
@@ -141,11 +142,21 @@ client.on("ready", () => {
         // client.user.setActivity(randomStatus.name, {type: randomStatus.type})
         setStatusFromTextFile();
     }, 1000 * 10 * 60);
+    
+    const channel = client.channels.cache.get('1207486730274607134'); // Replace with your channel ID
+	const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed, so add 1
+    const day = String(currentDate.getDate()).padStart(2, '0');
+    const formattedDate = `${year}_${month}_${day}`;
+    console.log(formattedDate);
+    console.log("sending item shop into the chat");
+    // channel.send(`This is your item shop!\nhttps://shop.easyfnstats.com/${formattedDate}_en.png`);
 });
 
 function setStatusFromTextFile() {
-    // const file = '/root/DiscordBot/LewBot/statuses.txt';
-    const file = 'statuses.txt';
+    const file = '/root/DiscordBot/LewBot/statuses.txt';
+    // const file = 'statuses.txt';
     fs.readFile(file, 'utf8', (err, data) => {
         if (err){
             console.log(error);

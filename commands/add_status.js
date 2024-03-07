@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
-const file = 'statuses.txt';
+const file = '/root/DiscordBot/LewBot/statuses.txt';
 
 const MAX_LEN = 128;
 
